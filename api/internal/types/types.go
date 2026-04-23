@@ -1,0 +1,378 @@
+package types
+
+type BaseRequest struct {
+}
+
+type BaseResponse struct {
+	Code    int    `json:"code"`
+	Message string `json:"message"`
+}
+
+type PageRequest struct {
+	Page     int `form:"page,default=1"`
+	PageSize int `form:"page_size,default=10"`
+}
+
+type PageResponse struct {
+	Total    int64       `json:"total"`
+	Page     int         `json:"page"`
+	PageSize int         `json:"page_size"`
+	List     interface{} `json:"list"`
+}
+
+type LoginRequest struct {
+	Username string `json:"username,optional"`
+	Password string `json:"password,optional"`
+}
+
+type LoginResponse struct {
+	Code    int    `json:"code"`
+	Message string `json:"message"`
+	Data    struct {
+		Token     string `json:"token"`
+		ExpiresAt int64  `json:"expires_at"`
+		UserInfo  struct {
+			ID       int64   `json:"id"`
+			Username string  `json:"username"`
+			Nickname string  `json:"nickname"`
+			Avatar   string  `json:"avatar"`
+			RoleIDs  []int64 `json:"role_ids"`
+		} `json:"user_info"`
+	} `json:"data"`
+}
+
+type RegisterRequest struct {
+	Username string `json:"username"`
+	Password string `json:"password"`
+	Nickname string `json:"nickname,optional"`
+	Email    string `json:"email,optional"`
+	Phone    string `json:"phone,optional"`
+}
+
+type UserInfoResponse struct {
+	Code    int    `json:"code"`
+	Message string `json:"message"`
+	Data    struct {
+		ID        int64                  `json:"id"`
+		Username  string                 `json:"username"`
+		Nickname  string                 `json:"nickname"`
+		Avatar    string                 `json:"avatar"`
+		Email     string                 `json:"email"`
+		Phone     string                 `json:"phone"`
+		Status    int                    `json:"status"`
+		CreatedAt string                 `json:"created_at"`
+		UpdatedAt string                 `json:"updated_at"`
+		Roles     []RoleInfo             `json:"roles"`
+		Permissions []PermissionInfo    `json:"permissions"`
+	} `json:"data"`
+}
+
+type CreateUserRequest struct {
+	Username string `json:"username"`
+	Password string `json:"password"`
+	Nickname string `json:"nickname,optional"`
+	Email    string `json:"email,optional"`
+	Phone    string `json:"phone,optional"`
+	Avatar   string `json:"avatar,optional"`
+	Status   int    `json:"status,optional,default=1"`
+	RoleIDs  []int64 `json:"role_ids,optional"`
+}
+
+type UpdateUserRequest struct {
+	ID       int64  `json:"id"`
+	Nickname string `json:"nickname,optional"`
+	Email    string `json:"email,optional"`
+	Phone    string `json:"phone,optional"`
+	Avatar   string `json:"avatar,optional"`
+	Status   int    `json:"status,optional"`
+	RoleIDs  []int64 `json:"role_ids,optional"`
+}
+
+type UpdatePasswordRequest struct {
+	ID          int64  `json:"id"`
+	OldPassword string `json:"old_password,optional"`
+	NewPassword string `json:"new_password"`
+}
+
+type UserListRequest struct {
+	PageRequest
+	Username string `form:"username,optional"`
+	Nickname string `form:"nickname,optional"`
+	Status   int    `form:"status,optional"`
+}
+
+type UserListItem struct {
+	ID        int64  `json:"id"`
+	Username  string `json:"username"`
+	Nickname  string `json:"nickname"`
+	Avatar    string `json:"avatar"`
+	Email     string `json:"email"`
+	Phone     string `json:"phone"`
+	Status    int    `json:"status"`
+	CreatedAt string `json:"created_at"`
+	UpdatedAt string `json:"updated_at"`
+}
+
+type UserListResponse struct {
+	Code    int    `json:"code"`
+	Message string `json:"message"`
+	Data    struct {
+		Total    int64          `json:"total"`
+		Page     int            `json:"page"`
+		PageSize int            `json:"page_size"`
+		List     []UserListItem `json:"list"`
+	} `json:"data"`
+}
+
+type RoleInfo struct {
+	ID          int64  `json:"id"`
+	Name        string `json:"name"`
+	Code        string `json:"code"`
+	Description string `json:"description"`
+	Status      int    `json:"status"`
+	Sort        int    `json:"sort"`
+	CreatedAt   string `json:"created_at"`
+	UpdatedAt   string `json:"updated_at"`
+}
+
+type CreateRoleRequest struct {
+	Name           string  `json:"name"`
+	Code           string  `json:"code"`
+	Description    string  `json:"description,optional"`
+	Status         int     `json:"status,optional,default=1"`
+	Sort           int     `json:"sort,optional,default=0"`
+	PermissionIDs  []int64 `json:"permission_ids,optional"`
+}
+
+type UpdateRoleRequest struct {
+	ID             int64  `json:"id"`
+	Name           string `json:"name,optional"`
+	Description    string `json:"description,optional"`
+	Status         int    `json:"status,optional"`
+	Sort           int    `json:"sort,optional"`
+	PermissionIDs  []int64 `json:"permission_ids,optional"`
+}
+
+type RoleListRequest struct {
+	PageRequest
+	Name   string `form:"name,optional"`
+	Status int    `form:"status,optional"`
+}
+
+type RoleListResponse struct {
+	Code    int    `json:"code"`
+	Message string `json:"message"`
+	Data    struct {
+		Total    int64      `json:"total"`
+		Page     int        `json:"page"`
+		PageSize int        `json:"page_size"`
+		List     []RoleInfo `json:"list"`
+	} `json:"data"`
+}
+
+type PermissionInfo struct {
+	ID        int64  `json:"id"`
+	Name      string `json:"name"`
+	Code      string `json:"code"`
+	Type      string `json:"type"`
+	ParentID  int64  `json:"parent_id"`
+	Path      string `json:"path"`
+	Icon      string `json:"icon"`
+	Component string `json:"component"`
+	Status    int    `json:"status"`
+	Sort      int    `json:"sort"`
+	CreatedAt string `json:"created_at"`
+	UpdatedAt string `json:"updated_at"`
+}
+
+type CreatePermissionRequest struct {
+	Name      string `json:"name"`
+	Code      string `json:"code"`
+	Type      string `json:"type"`
+	ParentID  int64  `json:"parent_id,optional"`
+	Path      string `json:"path,optional"`
+	Icon      string `json:"icon,optional"`
+	Component string `json:"component,optional"`
+	Status    int    `json:"status,optional,default=1"`
+	Sort      int    `json:"sort,optional,default=0"`
+}
+
+type UpdatePermissionRequest struct {
+	ID        int64  `json:"id"`
+	Name      string `json:"name,optional"`
+	Type      string `json:"type,optional"`
+	ParentID  int64  `json:"parent_id,optional"`
+	Path      string `json:"path,optional"`
+	Icon      string `json:"icon,optional"`
+	Component string `json:"component,optional"`
+	Status    int    `json:"status,optional"`
+	Sort      int    `json:"sort,optional"`
+}
+
+type PermissionListRequest struct {
+	PageRequest
+	Name   string `form:"name,optional"`
+	Type   string `form:"type,optional"`
+	Status int    `form:"status,optional"`
+}
+
+type PermissionListResponse struct {
+	Code    int    `json:"code"`
+	Message string `json:"message"`
+	Data    struct {
+		Total    int64            `json:"total"`
+		Page     int              `json:"page"`
+		PageSize int              `json:"page_size"`
+		List     []PermissionInfo `json:"list"`
+	} `json:"data"`
+}
+
+type SystemConfigInfo struct {
+	ID        int64  `json:"id"`
+	Key       string `json:"key"`
+	Value     string `json:"value"`
+	Name      string `json:"name"`
+	Remark    string `json:"remark"`
+	CreatedAt string `json:"created_at"`
+	UpdatedAt string `json:"updated_at"`
+}
+
+type CreateSystemConfigRequest struct {
+	Key    string `json:"key"`
+	Value  string `json:"value"`
+	Name   string `json:"name"`
+	Remark string `json:"remark,optional"`
+}
+
+type UpdateSystemConfigRequest struct {
+	ID     int64  `json:"id"`
+	Value  string `json:"value,optional"`
+	Name   string `json:"name,optional"`
+	Remark string `json:"remark,optional"`
+}
+
+type SystemConfigListRequest struct {
+	PageRequest
+	Key  string `form:"key,optional"`
+	Name string `form:"name,optional"`
+}
+
+type SystemConfigListResponse struct {
+	Code    int    `json:"code"`
+	Message string `json:"message"`
+	Data    struct {
+		Total    int64              `json:"total"`
+		Page     int                `json:"page"`
+		PageSize int                `json:"page_size"`
+		List     []SystemConfigInfo `json:"list"`
+	} `json:"data"`
+}
+
+type OperationLogInfo struct {
+	ID             int64  `json:"id"`
+	UserID         int64  `json:"user_id"`
+	Username       string `json:"username"`
+	Operation      string `json:"operation"`
+	Method         string `json:"method"`
+	RequestURI     string `json:"request_uri"`
+	RequestParams  string `json:"request_params"`
+	ResponseData   string `json:"response_data"`
+	IP             string `json:"ip"`
+	Location       string `json:"location"`
+	Browser        string `json:"browser"`
+	OS             string `json:"os"`
+	Status         int    `json:"status"`
+	ErrorMsg       string `json:"error_msg"`
+	Duration       int64  `json:"duration"`
+	CreatedAt      string `json:"created_at"`
+}
+
+type OperationLogListRequest struct {
+	PageRequest
+	Username  string `form:"username,optional"`
+	Operation string `form:"operation,optional"`
+	Method    string `form:"method,optional"`
+	Status    int    `form:"status,optional"`
+	StartTime string `form:"start_time,optional"`
+	EndTime   string `form:"end_time,optional"`
+}
+
+type OperationLogListResponse struct {
+	Code    int    `json:"code"`
+	Message string `json:"message"`
+	Data    struct {
+		Total    int64               `json:"total"`
+		Page     int                 `json:"page"`
+		PageSize int                 `json:"page_size"`
+		List     []OperationLogInfo  `json:"list"`
+	} `json:"data"`
+}
+
+type LoginLogInfo struct {
+	ID        int64  `json:"id"`
+	UserID    int64  `json:"user_id"`
+	Username  string `json:"username"`
+	IP        string `json:"ip"`
+	Location  string `json:"location"`
+	Browser   string `json:"browser"`
+	OS        string `json:"os"`
+	Status    int    `json:"status"`
+	Msg       string `json:"msg"`
+	CreatedAt string `json:"created_at"`
+}
+
+type LoginLogListRequest struct {
+	PageRequest
+	Username string `form:"username,optional"`
+	Status   int    `form:"status,optional"`
+	StartTime string `form:"start_time,optional"`
+	EndTime   string `form:"end_time,optional"`
+}
+
+type LoginLogListResponse struct {
+	Code    int    `json:"code"`
+	Message string `json:"message"`
+	Data    struct {
+		Total    int64          `json:"total"`
+		Page     int            `json:"page"`
+		PageSize int            `json:"page_size"`
+		List     []LoginLogInfo `json:"list"`
+	} `json:"data"`
+}
+
+type FileInfo struct {
+	ID           int64  `json:"id"`
+	Name         string `json:"name"`
+	OriginalName string `json:"original_name"`
+	Path         string `json:"path"`
+	URL          string `json:"url"`
+	Size         int64  `json:"size"`
+	Type         string `json:"type"`
+	Extension    string `json:"extension"`
+	MD5          string `json:"md5"`
+	UserID       int64  `json:"user_id"`
+	CreatedAt    string `json:"created_at"`
+}
+
+type UploadFileResponse struct {
+	Code    int    `json:"code"`
+	Message string `json:"message"`
+	Data    FileInfo `json:"data"`
+}
+
+type FileListRequest struct {
+	PageRequest
+	Name string `form:"name,optional"`
+	Type string `form:"type,optional"`
+}
+
+type FileListResponse struct {
+	Code    int    `json:"code"`
+	Message string `json:"message"`
+	Data    struct {
+		Total    int64       `json:"total"`
+		Page     int         `json:"page"`
+		PageSize int         `json:"page_size"`
+		List     []FileInfo  `json:"list"`
+	} `json:"data"`
+}
