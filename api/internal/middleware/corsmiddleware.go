@@ -5,7 +5,7 @@ import (
 	"strconv"
 	"strings"
 
-	"d:\code\work\go_zero\api\internal\config"
+	"go_zero/api/internal/config"
 
 	"github.com/zeromicro/go-zero/core/logx"
 )

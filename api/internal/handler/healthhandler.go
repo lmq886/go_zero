@@ -3,8 +3,8 @@ package handler
 import (
 	"net/http"
 
-	"d:\code\work\go_zero\api\internal\svc"
-	"d:\code\work\go_zero\api\internal\types"
+	"go_zero/api/internal/svc"
+	"go_zero/api/internal/types"
 
 	"github.com/zeromicro/go-zero/rest/httpx"
 )
@@ -25,15 +25,4 @@ func HealthHandler(svcCtx *svc.ServiceContext) http.HandlerFunc {
 		// 返回响应
 		httpx.OkJson(w, resp)
 	}
-}
-
-// HealthResp 健康检查响应结构体
-// 定义健康检查响应的格式
-type HealthResp struct {
-	// 服务状态
-	Status string `json:"status"`
-	// 服务版本
-	Version string `json:"version"`
-	// 运行时间
-	Uptime string `json:"uptime"`
 }

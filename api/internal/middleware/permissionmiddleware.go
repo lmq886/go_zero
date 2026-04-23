@@ -4,10 +4,9 @@ import (
 	"net/http"
 	"strings"
 
-	"d:\code\work\go_zero\api\internal\config"
+	"go_zero/api/internal/config"
 
 	"github.com/zeromicro/go-zero/core/logx"
-	"github.com/zeromicro/go-zero/rest/httpx"
 )
 
 // PermissionMiddleware 权限验证中间件
@@ -40,7 +39,7 @@ func (m *PermissionMiddleware) Handle(next http.HandlerFunc) http.HandlerFunc {
 		roles, ok := GetRolesFromContext(r.Context())
 		if !ok {
 			logx.Errorf("Failed to get roles from context")
-			httpx.Error(w, http.StatusForbidden, "禁止访问：无法获取用户角色信息")
+			WriteError(w, http.StatusForbidden, "禁止访问：无法获取用户角色信息")
 			return
 		}
 
@@ -61,14 +60,14 @@ func (m *PermissionMiddleware) Handle(next http.HandlerFunc) http.HandlerFunc {
 		permissions, ok := GetPermissionsFromContext(r.Context())
 		if !ok {
 			logx.Errorf("Failed to get permissions from context")
-			httpx.Error(w, http.StatusForbidden, "禁止访问：无法获取用户权限信息")
+			WriteError(w, http.StatusForbidden, "禁止访问：无法获取用户权限信息")
 			return
 		}
 
 		// 检查用户是否拥有所需权限
 		if !m.hasPermission(permissions, m.requiredPermission) {
 			logx.Errorf("User does not have required permission: %s", m.requiredPermission)
-			httpx.Error(w, http.StatusForbidden, "禁止访问：没有足够的权限")
+			WriteError(w, http.StatusForbidden, "禁止访问：没有足够的权限")
 			return
 		}
 
@@ -168,7 +167,7 @@ func (m *RoleMiddleware) Handle(next http.HandlerFunc) http.HandlerFunc {
 		roles, ok := GetRolesFromContext(r.Context())
 		if !ok {
 			logx.Errorf("Failed to get roles from context")
-			httpx.Error(w, http.StatusForbidden, "禁止访问：无法获取用户角色信息")
+			WriteError(w, http.StatusForbidden, "禁止访问：无法获取用户角色信息")
 			return
 		}
 
@@ -184,14 +183,14 @@ func (m *RoleMiddleware) Handle(next http.HandlerFunc) http.HandlerFunc {
 			// 需要所有角色
 			if !m.hasAllRoles(roles, m.requiredRoles) {
 				logx.Errorf("User does not have all required roles: %v", m.requiredRoles)
-				httpx.Error(w, http.StatusForbidden, "禁止访问：没有足够的角色权限")
+				WriteError(w, http.StatusForbidden, "禁止访问：没有足够的角色权限")
 				return
 			}
 		} else {
 			// 只需要其中一个角色
 			if !m.hasAnyRole(roles, m.requiredRoles) {
 				logx.Errorf("User does not have any of the required roles: %v", m.requiredRoles)
-				httpx.Error(w, http.StatusForbidden, "禁止访问：没有足够的角色权限")
+				WriteError(w, http.StatusForbidden, "禁止访问：没有足够的角色权限")
 				return
 			}
 		}

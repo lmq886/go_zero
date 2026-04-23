@@ -2,15 +2,15 @@ package middleware
 
 import (
 	"context"
+	"errors"
 	"net/http"
 	"strings"
 	"time"
 
-	"d:\code\work\go_zero\api\internal\config"
+	"go_zero/api/internal/config"
 
 	"github.com/golang-jwt/jwt/v4"
 	"github.com/zeromicro/go-zero/core/logx"
-	"github.com/zeromicro/go-zero/rest/httpx"
 )
 
 // 定义上下文键类型
@@ -26,6 +26,14 @@ const (
 	RolesKey contextKey = "roles"
 	// PermissionsKey 用户权限上下文键
 	PermissionsKey contextKey = "permissions"
+)
+
+// 定义 JWT 相关错误
+var (
+	// ErrTokenInvalid 令牌无效错误
+	ErrTokenInvalid = errors.New("token is invalid")
+	// ErrTokenExpired 令牌过期错误
+	ErrTokenExpired = errors.New("token is expired")
 )
 
 // JwtAuthMiddleware JWT 认证中间件
@@ -55,7 +63,7 @@ func (m *JwtAuthMiddleware) Handle(next http.HandlerFunc) http.HandlerFunc {
 		if authHeader == "" {
 			// 没有 Authorization 头，返回 401 未授权
 			logx.Errorf("Missing Authorization header")
-			httpx.Error(w, http.StatusUnauthorized, "未授权：缺少认证令牌")
+			WriteError(w, http.StatusUnauthorized, "未授权：缺少认证令牌")
 			return
 		}
 
@@ -64,7 +72,7 @@ func (m *JwtAuthMiddleware) Handle(next http.HandlerFunc) http.HandlerFunc {
 		if !(len(parts) == 2 && parts[0] == "Bearer") {
 			// Authorization 头格式错误
 			logx.Errorf("Invalid Authorization header format")
-			httpx.Error(w, http.StatusUnauthorized, "未授权：认证令牌格式错误")
+			WriteError(w, http.StatusUnauthorized, "未授权：认证令牌格式错误")
 			return
 		}
 
@@ -75,7 +83,7 @@ func (m *JwtAuthMiddleware) Handle(next http.HandlerFunc) http.HandlerFunc {
 		claims, err := m.parseToken(tokenString)
 		if err != nil {
 			logx.Errorf("Token validation failed: %v", err)
-			httpx.Error(w, http.StatusUnauthorized, "未授权：令牌无效或已过期")
+			WriteError(w, http.StatusUnauthorized, "未授权：令牌无效或已过期")
 			return
 		}
 
@@ -114,7 +122,7 @@ func (m *JwtAuthMiddleware) parseToken(tokenString string) (*CustomClaims, error
 	token, err := jwt.ParseWithClaims(tokenString, &CustomClaims{}, func(token *jwt.Token) (interface{}, error) {
 		// 验证签名方法
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
-			return nil, jwt.ErrSignatureInvalid
+			return nil, ErrTokenInvalid
 		}
 		// 返回签名密钥
 		return []byte(m.config.AccessSecret), nil
@@ -128,12 +136,12 @@ func (m *JwtAuthMiddleware) parseToken(tokenString string) (*CustomClaims, error
 	if claims, ok := token.Claims.(*CustomClaims); ok && token.Valid {
 		// 检查令牌是否过期
 		if claims.ExpiresAt != nil && claims.ExpiresAt.Before(time.Now()) {
-			return nil, jwt.ErrTokenExpired
+			return nil, ErrTokenExpired
 		}
 		return claims, nil
 	}
 
-	return nil, jwt.ErrTokenInvalid
+	return nil, ErrTokenInvalid
 }
 
 // GenerateToken 生成 JWT 令牌
@@ -207,7 +215,7 @@ func ParseRefreshToken(tokenString string, config config.AuthConfig) (int64, str
 	token, err := jwt.ParseWithClaims(tokenString, &CustomClaims{}, func(token *jwt.Token) (interface{}, error) {
 		// 验证签名方法
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
-			return nil, jwt.ErrSignatureInvalid
+			return nil, ErrTokenInvalid
 		}
 		// 返回签名密钥
 		return []byte(config.RefreshSecret), nil
@@ -221,12 +229,12 @@ func ParseRefreshToken(tokenString string, config config.AuthConfig) (int64, str
 	if claims, ok := token.Claims.(*CustomClaims); ok && token.Valid {
 		// 检查令牌是否过期
 		if claims.ExpiresAt != nil && claims.ExpiresAt.Before(time.Now()) {
-			return 0, "", jwt.ErrTokenExpired
+			return 0, "", ErrTokenExpired
 		}
 		return claims.UserId, claims.Username, nil
 	}
 
-	return 0, "", jwt.ErrTokenInvalid
+	return 0, "", ErrTokenInvalid
 }
 
 // GetUserIdFromContext 从上下文中获取用户ID

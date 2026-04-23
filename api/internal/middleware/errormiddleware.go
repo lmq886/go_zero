@@ -6,7 +6,6 @@ import (
 	"runtime/debug"
 
 	"github.com/zeromicro/go-zero/core/logx"
-	"github.com/zeromicro/go-zero/rest/httpx"
 )
 
 // ErrorMiddleware 错误处理中间件
@@ -310,6 +309,16 @@ func WriteJSONResponse(w http.ResponseWriter, response interface{}) {
 // 参数 code: HTTP 状态码
 // 参数 message: 错误消息
 func WriteError(w http.ResponseWriter, code int, message string) {
-	// 使用 httpx 写入错误
-	httpx.Error(w, code, message)
+	// 设置响应头
+	w.Header().Set("Content-Type", "application/json; charset=utf-8")
+	w.WriteHeader(code)
+
+	// 构建错误响应
+	response := ErrorResponse{
+		Code:    code,
+		Message: message,
+	}
+
+	// 序列化并写入响应
+	json.NewEncoder(w).Encode(response)
 }

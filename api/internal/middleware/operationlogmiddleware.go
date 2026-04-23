@@ -3,14 +3,15 @@ package middleware
 import (
 	"bytes"
 	"context"
+	"database/sql"
 	"io/ioutil"
 	"net/http"
 	"strings"
 	"time"
 
-	"d:\code\work\go_zero\api\internal\config"
-	"d:\code\work\go_zero\api\internal\svc"
-	"d:\code\work\go_zero\model"
+	"go_zero/api/internal/config"
+	"go_zero/api/internal/svc"
+	"go_zero/model"
 
 	"github.com/zeromicro/go-zero/core/logx"
 )

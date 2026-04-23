@@ -4,9 +4,9 @@ import (
 	"flag"
 	"fmt"
 
-	"d:\code\work\go_zero\api\internal\config"
-	"d:\code\work\go_zero\api\internal\handler"
-	"d:\code\work\go_zero\api\internal\svc"
+	"go_zero/api/internal/config"
+	"go_zero/api/internal/svc"
+	"go_zero/api/routes"
 
 	"github.com/zeromicro/go-zero/core/conf"
 	"github.com/zeromicro/go-zero/core/logx"
@@ -41,7 +41,7 @@ func main() {
 
 	// 注册路由
 	// 将所有 HTTP 处理器注册到服务器
-	handler.RegisterHandlers(server, serverCtx)
+	routes.RegisterHandlers(server, serverCtx)
 
 	// 打印服务启动信息
 	fmt.Printf("Starting server at %s:%d...\n", c.Host, c.Port)

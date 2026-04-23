@@ -1,5 +1,17 @@
 package types
 
+// ==================== 健康检查类型定义 ====================
+
+// HealthResp 健康检查响应
+type HealthResp struct {
+	// 服务状态
+	Status string `json:"status"`
+	// 服务版本
+	Version string `json:"version"`
+	// 运行时间
+	Uptime string `json:"uptime"`
+}
+
 // ==================== 通用类型定义 ====================
 
 // PaginationReq 分页请求

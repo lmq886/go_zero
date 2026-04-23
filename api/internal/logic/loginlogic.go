@@ -6,10 +6,10 @@ import (
 	"errors"
 	"time"
 
-	"d:\code\work\go_zero\api\internal\middleware"
-	"d:\code\work\go_zero\api\internal\svc"
-	"d:\code\work\go_zero\api\internal\types"
-	"d:\code\work\go_zero\model"
+	"go_zero/api/internal/middleware"
+	"go_zero/api/internal/svc"
+	"go_zero/api/internal/types"
+	"go_zero/model"
 
 	"github.com/zeromicro/go-zero/core/logx"
 	"golang.org/x/crypto/bcrypt"
@@ -369,7 +369,7 @@ func (l *RefreshTokenLogic) RefreshToken(req *types.RefreshTokenReq) (*types.Ref
 	}
 
 	// 2. 解析刷新令牌
-	userId, username, err := middleware.ParseRefreshToken(req.RefreshToken, l.svcCtx.Config.Auth)
+	userId, _, err := middleware.ParseRefreshToken(req.RefreshToken, l.svcCtx.Config.Auth)
 	if err != nil {
 		l.Errorf("Failed to parse refresh token: %v", err)
 		return nil, errors.New("刷新令牌无效或已过期")

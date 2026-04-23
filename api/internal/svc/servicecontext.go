@@ -3,8 +3,8 @@ package svc
 import (
 	"fmt"
 
-	"d:\code\work\go_zero\api\internal\config"
-	"d:\code\work\go_zero\model"
+	"go_zero/api/internal/config"
+	"go_zero/model"
 
 	"github.com/zeromicro/go-zero/core/stores/postgres"
 	"github.com/zeromicro/go-zero/core/stores/sqlx"
@@ -50,15 +50,15 @@ func NewServiceContext(c config.Config) *ServiceContext {
 	conn := postgres.New(dsn)
 
 	return &ServiceContext{
-		Config:             c,
-		DB:                 conn,
-		UserModel:          model.NewUserModel(conn),
-		RoleModel:          model.NewRoleModel(conn),
-		PermissionModel:    model.NewPermissionModel(conn),
-		MenuModel:          model.NewMenuModel(conn),
-		OperationLogModel:  model.NewOperationLogModel(conn),
-		LoginLogModel:      model.NewLoginLogModel(conn),
-		ConfigModel:        model.NewConfigModel(conn),
+		Config:            c,
+		DB:                conn,
+		UserModel:         model.NewUserModel(conn),
+		RoleModel:         model.NewRoleModel(conn),
+		PermissionModel:   model.NewPermissionModel(conn),
+		MenuModel:         model.NewMenuModel(conn),
+		OperationLogModel: model.NewOperationLogModel(conn),
+		LoginLogModel:     model.NewLoginLogModel(conn),
+		ConfigModel:       model.NewConfigModel(conn),
 	}
 }
 

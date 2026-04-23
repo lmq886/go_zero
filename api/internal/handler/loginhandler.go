@@ -3,9 +3,10 @@ package handler
 import (
 	"net/http"
 
-	"d:\code\work\go_zero\api\internal\logic"
-	"d:\code\work\go_zero\api\internal\svc"
-	"d:\code\work\go_zero\api\internal\types"
+	"go_zero/api/internal/logic"
+	"go_zero/api/internal/middleware"
+	"go_zero/api/internal/svc"
+	"go_zero/api/internal/types"
 
 	"github.com/zeromicro/go-zero/rest/httpx"
 )
@@ -19,7 +20,7 @@ func LoginHandler(svcCtx *svc.ServiceContext) http.HandlerFunc {
 		// 解析请求参数
 		var req types.LoginReq
 		if err := httpx.Parse(r, &req); err != nil {
-			httpx.Error(w, http.StatusBadRequest, err.Error())
+			middleware.WriteError(w, http.StatusBadRequest, err.Error())
 			return
 		}
 
@@ -29,7 +30,7 @@ func LoginHandler(svcCtx *svc.ServiceContext) http.HandlerFunc {
 		// 执行登录逻辑
 		resp, err := l.Login(&req)
 		if err != nil {
-			httpx.Error(w, http.StatusUnauthorized, err.Error())
+			middleware.WriteError(w, http.StatusUnauthorized, err.Error())
 			return
 		}
 
@@ -47,7 +48,7 @@ func RegisterHandler(svcCtx *svc.ServiceContext) http.HandlerFunc {
 		// 解析请求参数
 		var req types.RegisterReq
 		if err := httpx.Parse(r, &req); err != nil {
-			httpx.Error(w, http.StatusBadRequest, err.Error())
+			middleware.WriteError(w, http.StatusBadRequest, err.Error())
 			return
 		}
 
@@ -57,7 +58,7 @@ func RegisterHandler(svcCtx *svc.ServiceContext) http.HandlerFunc {
 		// 执行注册逻辑
 		resp, err := l.Register(&req)
 		if err != nil {
-			httpx.Error(w, http.StatusBadRequest, err.Error())
+			middleware.WriteError(w, http.StatusBadRequest, err.Error())
 			return
 		}
 
@@ -75,7 +76,7 @@ func LogoutHandler(svcCtx *svc.ServiceContext) http.HandlerFunc {
 		// 解析请求参数
 		var req types.LogoutReq
 		if err := httpx.Parse(r, &req); err != nil {
-			httpx.Error(w, http.StatusBadRequest, err.Error())
+			middleware.WriteError(w, http.StatusBadRequest, err.Error())
 			return
 		}
 
@@ -85,7 +86,7 @@ func LogoutHandler(svcCtx *svc.ServiceContext) http.HandlerFunc {
 		// 执行登出逻辑
 		resp, err := l.Logout(&req)
 		if err != nil {
-			httpx.Error(w, http.StatusInternalServerError, err.Error())
+			middleware.WriteError(w, http.StatusInternalServerError, err.Error())
 			return
 		}
 
@@ -103,7 +104,7 @@ func RefreshTokenHandler(svcCtx *svc.ServiceContext) http.HandlerFunc {
 		// 解析请求参数
 		var req types.RefreshTokenReq
 		if err := httpx.Parse(r, &req); err != nil {
-			httpx.Error(w, http.StatusBadRequest, err.Error())
+			middleware.WriteError(w, http.StatusBadRequest, err.Error())
 			return
 		}
 
@@ -113,7 +114,7 @@ func RefreshTokenHandler(svcCtx *svc.ServiceContext) http.HandlerFunc {
 		// 执行令牌刷新逻辑
 		resp, err := l.RefreshToken(&req)
 		if err != nil {
-			httpx.Error(w, http.StatusUnauthorized, err.Error())
+			middleware.WriteError(w, http.StatusUnauthorized, err.Error())
 			return
 		}
 
