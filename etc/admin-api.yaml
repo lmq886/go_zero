@@ -1,0 +1,29 @@
+Name: admin-api
+Host: 0.0.0.0
+Port: 8888
+Mode: dev
+
+Log:
+  ServiceName: admin-api
+  Mode: console
+  Level: info
+
+DB:
+  DataSource: host=localhost port=5432 user=postgres password=postgres dbname=admin sslmode=disable
+  MaxOpenConns: 100
+  MaxIdleConns: 10
+  LogLevel: info
+
+Cache:
+  - Host: localhost:6379
+    Pass: 
+    Type: node
+
+JwtAuth:
+  AccessSecret: gozero-admin-secret-key-2024
+  AccessExpire: 86400
+
+Upload:
+  MaxSize: 10485760
+  AllowTypes: jpg,jpeg,png,gif,doc,docx,xls,xlsx,pdf,txt
+  SavePath: ./uploads
