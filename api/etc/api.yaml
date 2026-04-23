@@ -1,0 +1,197 @@
+# 企业级后台管理系统 API 服务配置文件
+# 遵循 GoZero 最佳实践
+
+# 服务名称
+Name: admin-api
+
+# 服务监听地址
+Host: 0.0.0.0
+
+# 服务监听端口
+Port: 8080
+
+# 服务模式（debug, test, release）
+Mode: debug
+
+# 日志配置
+Log:
+  # 日志级别（debug, info, warn, error, severe, fatal）
+  Level: info
+  # 日志模式（console, file, volume）
+  Mode: console
+  # 日志编码格式（json, plain）
+  Encoding: plain
+  # 日志输出路径（文件模式时使用）
+  Path: ./logs
+  # 是否压缩日志文件
+  Compress: true
+  # 日志保留天数
+  KeepDays: 7
+  # 日志堆栈级别
+  StackCoolDownMillis: 100
+
+# 数据库配置
+DataSource:
+  # 数据库类型（mysql, postgres, sqlite）
+  Type: postgres
+  # 数据库主机地址
+  Host: localhost
+  # 数据库端口
+  Port: 5432
+  # 数据库名称
+  Database: admin_system
+  # 数据库用户名
+  Username: postgres
+  # 数据库密码
+  Password: password
+  # 字符集
+  Charset: utf8mb4
+  # 最大空闲连接数
+  MaxIdleConns: 10
+  # 最大打开连接数
+  MaxOpenConns: 100
+  # 连接最大生命周期（秒）
+  MaxLifetime: 3600
+  # 是否启用 SSL
+  SSLMode: disable
+  # 时区
+  TimeZone: Asia/Shanghai
+
+# JWT 配置
+Auth:
+  # 访问令牌密钥
+  AccessSecret: gozero-admin-api-access-secret-key-2024
+  # 访问令牌有效期（秒），默认 2 小时
+  AccessExpire: 7200
+  # 刷新令牌密钥
+  RefreshSecret: gozero-admin-api-refresh-secret-key-2024
+  # 刷新令牌有效期（秒），默认 7 天
+  RefreshExpire: 604800
+  # 发行者
+  Issuer: admin-api
+  # 受众
+  Audience: admin-web
+
+# 缓存配置（可选）
+CacheRedis:
+  - # Redis 主机地址
+    Host: localhost:6379
+    # Redis 密码
+    Pass: 
+    # Redis 数据库索引
+    Type: node
+
+# Prometheus 监控配置
+Prometheus:
+  # 是否启用
+  Enabled: true
+  # 监听地址
+  Host: 0.0.0.0
+  # 监听端口
+  Port: 9090
+  # 路径
+  Path: /metrics
+
+# 限流配置
+RateLimit:
+  # 是否启用
+  Enabled: true
+  # 每秒允许的请求数
+  RequestsPerSecond: 100
+  # 突发请求数
+  Burst: 200
+
+# 熔断配置
+CircuitBreaker:
+  # 是否启用
+  Enabled: true
+  # 熔断窗口大小（秒）
+  Window: 10
+  # 熔断阈值（错误率百分比）
+  Threshold: 50
+  # 最小请求数
+  MinRequests: 10
+  # 半开状态允许的请求数
+  HalfOpenRequests: 5
+  # 冷却时间（秒）
+  CoolDown: 5
+
+# CORS 配置
+CORS:
+  # 是否启用
+  Enabled: true
+  # 允许的来源
+  AllowOrigins:
+    - "*"
+  # 允许的请求方法
+  AllowMethods:
+    - GET
+    - POST
+    - PUT
+    - DELETE
+    - OPTIONS
+    - PATCH
+  # 允许的请求头
+  AllowHeaders:
+    - Content-Type
+    - Authorization
+    - X-Requested-With
+    - Accept
+    - Origin
+    - Access-Control-Request-Method
+    - Access-Control-Request-Headers
+  # 暴露的响应头
+  ExposeHeaders:
+    - Content-Type
+    - Content-Length
+    - Access-Control-Allow-Origin
+    - Access-Control-Allow-Credentials
+  # 是否允许凭证
+  AllowCredentials: true
+  # 预检请求的有效期（秒）
+  MaxAge: 86400
+
+# 操作日志配置
+OperationLog:
+  # 是否启用
+  Enabled: true
+  # 是否记录请求数据
+  RecordRequest: true
+  # 是否记录响应数据
+  RecordResponse: true
+  # 排除的路径（不记录日志）
+  ExcludePaths:
+    - /api/v1/auth/login
+    - /api/v1/auth/register
+    - /api/v1/auth/refresh
+    - /health
+    - /metrics
+
+# 登录日志配置
+LoginLog:
+  # 是否启用
+  Enabled: true
+
+# 系统配置
+System:
+  # 超级管理员角色编码
+  SuperAdminRoleCode: super_admin
+  # 默认密码（用于重置密码）
+  DefaultPassword: admin123
+  # 密码最小长度
+  PasswordMinLength: 6
+  # 密码最大长度
+  PasswordMaxLength: 20
+  # 登录失败最大重试次数
+  LoginMaxRetries: 5
+  # 登录失败锁定时长（分钟）
+  LoginLockDuration: 30
+  # 是否允许用户注册
+  AllowRegister: true
+
+# 健康检查配置
+Health:
+  # 是否启用
+  Enabled: true
+  # 健康检查路径
+  Path: /health

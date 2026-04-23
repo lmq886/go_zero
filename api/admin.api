@@ -1,0 +1,1031 @@
+// GoZero 企业级后台管理系统 API 定义
+// 遵循 GoZero 最佳实践，采用 RESTful API 设计
+
+// 定义 API 服务信息
+syntax = "v1"
+
+// 服务信息
+info(
+    title: "企业级后台管理系统 API"
+    desc: "包含用户管理、角色权限、菜单管理、日志管理等完整后台功能"
+    author: "GoZero Enterprise Team"
+    email: "support@gozero.com"
+    version: "v1.0.0"
+)
+
+// 服务定义
+service admin-api {
+    // ==================== 认证模块 ====================
+    @handler Login
+    post /api/v1/auth/login (LoginReq) returns (LoginResp)
+
+    @handler Register
+    post /api/v1/auth/register (RegisterReq) returns (RegisterResp)
+
+    @handler Logout
+    post /api/v1/auth/logout (LogoutReq) returns (LogoutResp)
+
+    @handler RefreshToken
+    post /api/v1/auth/refresh (RefreshTokenReq) returns (RefreshTokenResp)
+
+    // ==================== 用户管理模块 ====================
+    @handler GetUserList
+    get /api/v1/users (GetUserListReq) returns (GetUserListResp)
+
+    @handler GetUserById
+    get /api/v1/users/:id (GetUserByIdReq) returns (GetUserByIdResp)
+
+    @handler CreateUser
+    post /api/v1/users (CreateUserReq) returns (CreateUserResp)
+
+    @handler UpdateUser
+    put /api/v1/users/:id (UpdateUserReq) returns (UpdateUserResp)
+
+    @handler DeleteUser
+    delete /api/v1/users/:id (DeleteUserReq) returns (DeleteUserResp)
+
+    @handler ResetPassword
+    post /api/v1/users/:id/reset-password (ResetPasswordReq) returns (ResetPasswordResp)
+
+    @handler UpdateProfile
+    put /api/v1/users/profile (UpdateProfileReq) returns (UpdateProfileResp)
+
+    @handler GetProfile
+    get /api/v1/users/profile (GetProfileReq) returns (GetProfileResp)
+
+    // ==================== 角色管理模块 ====================
+    @handler GetRoleList
+    get /api/v1/roles (GetRoleListReq) returns (GetRoleListResp)
+
+    @handler GetRoleById
+    get /api/v1/roles/:id (GetRoleByIdReq) returns (GetRoleByIdResp)
+
+    @handler CreateRole
+    post /api/v1/roles (CreateRoleReq) returns (CreateRoleResp)
+
+    @handler UpdateRole
+    put /api/v1/roles/:id (UpdateRoleReq) returns (UpdateRoleResp)
+
+    @handler DeleteRole
+    delete /api/v1/roles/:id (DeleteRoleReq) returns (DeleteRoleResp)
+
+    @handler AssignPermissions
+    post /api/v1/roles/:id/permissions (AssignPermissionsReq) returns (AssignPermissionsResp)
+
+    @handler GetRolePermissions
+    get /api/v1/roles/:id/permissions (GetRolePermissionsReq) returns (GetRolePermissionsResp)
+
+    // ==================== 权限管理模块 ====================
+    @handler GetPermissionList
+    get /api/v1/permissions (GetPermissionListReq) returns (GetPermissionListResp)
+
+    @handler GetPermissionById
+    get /api/v1/permissions/:id (GetPermissionByIdReq) returns (GetPermissionByIdResp)
+
+    @handler CreatePermission
+    post /api/v1/permissions (CreatePermissionReq) returns (CreatePermissionResp)
+
+    @handler UpdatePermission
+    put /api/v1/permissions/:id (UpdatePermissionReq) returns (UpdatePermissionResp)
+
+    @handler DeletePermission
+    delete /api/v1/permissions/:id (DeletePermissionReq) returns (DeletePermissionResp)
+
+    // ==================== 菜单管理模块 ====================
+    @handler GetMenuList
+    get /api/v1/menus (GetMenuListReq) returns (GetMenuListResp)
+
+    @handler GetMenuById
+    get /api/v1/menus/:id (GetMenuByIdReq) returns (GetMenuByIdResp)
+
+    @handler CreateMenu
+    post /api/v1/menus (CreateMenuReq) returns (CreateMenuResp)
+
+    @handler UpdateMenu
+    put /api/v1/menus/:id (UpdateMenuReq) returns (UpdateMenuResp)
+
+    @handler DeleteMenu
+    delete /api/v1/menus/:id (DeleteMenuReq) returns (DeleteMenuResp)
+
+    @handler GetUserMenus
+    get /api/v1/menus/user (GetUserMenusReq) returns (GetUserMenusResp)
+
+    // ==================== 日志管理模块 ====================
+    @handler GetOperationLogList
+    get /api/v1/logs/operation (GetOperationLogListReq) returns (GetOperationLogListResp)
+
+    @handler GetLoginLogList
+    get /api/v1/logs/login (GetLoginLogListReq) returns (GetLoginLogListResp)
+
+    @handler DeleteOperationLog
+    delete /api/v1/logs/operation/:id (DeleteOperationLogReq) returns (DeleteOperationLogResp)
+
+    @handler DeleteLoginLog
+    delete /api/v1/logs/login/:id (DeleteLoginLogReq) returns (DeleteLoginLogResp)
+
+    @handler ClearOperationLogs
+    delete /api/v1/logs/operation (ClearOperationLogsReq) returns (ClearOperationLogsResp)
+
+    @handler ClearLoginLogs
+    delete /api/v1/logs/login (ClearLoginLogsReq) returns (ClearLoginLogsResp)
+
+    // ==================== 系统配置模块 ====================
+    @handler GetConfigList
+    get /api/v1/configs (GetConfigListReq) returns (GetConfigListResp)
+
+    @handler GetConfigByKey
+    get /api/v1/configs/:key (GetConfigByKeyReq) returns (GetConfigByKeyResp)
+
+    @handler CreateConfig
+    post /api/v1/configs (CreateConfigReq) returns (CreateConfigResp)
+
+    @handler UpdateConfig
+    put /api/v1/configs/:key (UpdateConfigReq) returns (UpdateConfigResp)
+
+    @handler DeleteConfig
+    delete /api/v1/configs/:key (DeleteConfigReq) returns (DeleteConfigResp)
+}
+
+// ==================== 通用类型定义 ====================
+
+// 分页请求
+type PaginationReq {
+    Page     int `json:"page,optional" form:"page,optional"`     // 页码，默认 1
+    PageSize int `json:"pageSize,optional" form:"pageSize,optional"` // 每页数量，默认 10
+}
+
+// 分页响应
+type PaginationResp {
+    Total    int64 `json:"total"`     // 总记录数
+    Page     int   `json:"page"`      // 当前页码
+    PageSize int   `json:"pageSize"`  // 每页数量
+}
+
+// 通用响应
+type BaseResp {
+    Code    int    `json:"code"`      // 状态码
+    Message string `json:"message"`   // 消息
+}
+
+// ==================== 认证模块类型定义 ====================
+
+// 登录请求
+type LoginReq {
+    Username string `json:"username"` // 用户名
+    Password string `json:"password"` // 密码
+}
+
+// 登录响应
+type LoginResp {
+    Code        int    `json:"code"`        // 状态码
+    Message     string `json:"message"`     // 消息
+    AccessToken string `json:"accessToken"` // 访问令牌
+    RefreshToken string `json:"refreshToken"` // 刷新令牌
+    ExpiresAt   int64  `json:"expiresAt"`   // 过期时间
+    UserInfo    UserInfo `json:"userInfo"`   // 用户信息
+}
+
+// 用户信息
+type UserInfo {
+    Id          int64    `json:"id"`          // 用户ID
+    Username    string   `json:"username"`    // 用户名
+    Email       string   `json:"email"`       // 邮箱
+    Phone       string   `json:"phone"`       // 手机号
+    Nickname    string   `json:"nickname"`    // 昵称
+    Avatar      string   `json:"avatar"`      // 头像
+    Status      int      `json:"status"`      // 状态
+    Roles       []string `json:"roles"`       // 角色列表
+    Permissions []string `json:"permissions"` // 权限列表
+    CreatedAt   int64    `json:"createdAt"`   // 创建时间
+}
+
+// 注册请求
+type RegisterReq {
+    Username string `json:"username"` // 用户名
+    Password string `json:"password"` // 密码
+    Email    string `json:"email,optional"`    // 邮箱
+    Phone    string `json:"phone,optional"`    // 手机号
+    Nickname string `json:"nickname,optional"` // 昵称
+}
+
+// 注册响应
+type RegisterResp {
+    Code    int    `json:"code"`    // 状态码
+    Message string `json:"message"` // 消息
+    UserId  int64  `json:"userId"`  // 用户ID
+}
+
+// 登出请求
+type LogoutReq {
+}
+
+// 登出响应
+type LogoutResp {
+    Code    int    `json:"code"`    // 状态码
+    Message string `json:"message"` // 消息
+}
+
+// 刷新令牌请求
+type RefreshTokenReq {
+    RefreshToken string `json:"refreshToken"` // 刷新令牌
+}
+
+// 刷新令牌响应
+type RefreshTokenResp {
+    Code        int    `json:"code"`        // 状态码
+    Message     string `json:"message"`     // 消息
+    AccessToken string `json:"accessToken"` // 访问令牌
+    ExpiresAt   int64  `json:"expiresAt"`   // 过期时间
+}
+
+// ==================== 用户管理模块类型定义 ====================
+
+// 获取用户列表请求
+type GetUserListReq {
+    PaginationReq
+    Username string `json:"username,optional" form:"username,optional"` // 用户名（模糊查询）
+    Email    string `json:"email,optional" form:"email,optional"`       // 邮箱（模糊查询）
+    Phone    string `json:"phone,optional" form:"phone,optional"`       // 手机号（模糊查询）
+    Status   int    `json:"status,optional" form:"status,optional"`     // 状态
+}
+
+// 获取用户列表响应
+type GetUserListResp {
+    Code       int             `json:"code"`       // 状态码
+    Message    string          `json:"message"`    // 消息
+    Pagination PaginationResp  `json:"pagination"` // 分页信息
+    Data       []UserListItem  `json:"data"`       // 用户列表
+}
+
+// 用户列表项
+type UserListItem {
+    Id        int64    `json:"id"`        // 用户ID
+    Username  string   `json:"username"`  // 用户名
+    Email     string   `json:"email"`     // 邮箱
+    Phone     string   `json:"phone"`     // 手机号
+    Nickname  string   `json:"nickname"`  // 昵称
+    Avatar    string   `json:"avatar"`    // 头像
+    Status    int      `json:"status"`    // 状态
+    Roles     []string `json:"roles"`     // 角色列表
+    CreatedAt int64    `json:"createdAt"` // 创建时间
+    UpdatedAt int64    `json:"updatedAt"` // 更新时间
+}
+
+// 根据ID获取用户请求
+type GetUserByIdReq {
+    Id int64 `json:"id,optional" path:"id"` // 用户ID
+}
+
+// 根据ID获取用户响应
+type GetUserByIdResp {
+    Code    int    `json:"code"`    // 状态码
+    Message string `json:"message"` // 消息
+    Data    UserDetail `json:"data"`   // 用户详情
+}
+
+// 用户详情
+type UserDetail {
+    Id           int64    `json:"id"`           // 用户ID
+    Username     string   `json:"username"`     // 用户名
+    Email        string   `json:"email"`        // 邮箱
+    Phone        string   `json:"phone"`        // 手机号
+    Nickname     string   `json:"nickname"`     // 昵称
+    Avatar       string   `json:"avatar"`       // 头像
+    Gender       int      `json:"gender"`       // 性别
+    Birthday     string   `json:"birthday"`     // 生日
+    Address      string   `json:"address"`      // 地址
+    Introduction string   `json:"introduction"` // 简介
+    Status       int      `json:"status"`       // 状态
+    Roles        []RoleInfo `json:"roles"`      // 角色列表
+    CreatedAt    int64    `json:"createdAt"`    // 创建时间
+    UpdatedAt    int64    `json:"updatedAt"`    // 更新时间
+}
+
+// 角色信息
+type RoleInfo {
+    Id          int64  `json:"id"`          // 角色ID
+    Name        string `json:"name"`        // 角色名称
+    Code        string `json:"code"`        // 角色编码
+    Description string `json:"description"` // 角色描述
+}
+
+// 创建用户请求
+type CreateUserReq {
+    Username string `json:"username"` // 用户名
+    Password string `json:"password"` // 密码
+    Email    string `json:"email,optional"`    // 邮箱
+    Phone    string `json:"phone,optional"`    // 手机号
+    Nickname string `json:"nickname,optional"` // 昵称
+    Avatar   string `json:"avatar,optional"`   // 头像
+    Status   int    `json:"status,optional"`   // 状态
+    RoleIds  []int64 `json:"roleIds,optional"` // 角色ID列表
+}
+
+// 创建用户响应
+type CreateUserResp {
+    Code    int    `json:"code"`    // 状态码
+    Message string `json:"message"` // 消息
+    UserId  int64  `json:"userId"`  // 用户ID
+}
+
+// 更新用户请求
+type UpdateUserReq {
+    Id           int64  `json:"id,optional" path:"id"` // 用户ID
+    Email        string `json:"email,optional"`         // 邮箱
+    Phone        string `json:"phone,optional"`         // 手机号
+    Nickname     string `json:"nickname,optional"`      // 昵称
+    Avatar       string `json:"avatar,optional"`        // 头像
+    Gender       int    `json:"gender,optional"`        // 性别
+    Birthday     string `json:"birthday,optional"`      // 生日
+    Address      string `json:"address,optional"`       // 地址
+    Introduction string `json:"introduction,optional"`  // 简介
+    Status       int    `json:"status,optional"`        // 状态
+    RoleIds      []int64 `json:"roleIds,optional"`     // 角色ID列表
+}
+
+// 更新用户响应
+type UpdateUserResp {
+    Code    int    `json:"code"`    // 状态码
+    Message string `json:"message"` // 消息
+}
+
+// 删除用户请求
+type DeleteUserReq {
+    Id int64 `json:"id,optional" path:"id"` // 用户ID
+}
+
+// 删除用户响应
+type DeleteUserResp {
+    Code    int    `json:"code"`    // 状态码
+    Message string `json:"message"` // 消息
+}
+
+// 重置密码请求
+type ResetPasswordReq {
+    Id          int64  `json:"id,optional" path:"id"` // 用户ID
+    NewPassword string `json:"newPassword"`             // 新密码
+}
+
+// 重置密码响应
+type ResetPasswordResp {
+    Code    int    `json:"code"`    // 状态码
+    Message string `json:"message"` // 消息
+}
+
+// 更新个人资料请求
+type UpdateProfileReq {
+    Nickname     string `json:"nickname,optional"`     // 昵称
+    Avatar       string `json:"avatar,optional"`       // 头像
+    Gender       int    `json:"gender,optional"`       // 性别
+    Birthday     string `json:"birthday,optional"`     // 生日
+    Address      string `json:"address,optional"`      // 地址
+    Introduction string `json:"introduction,optional"` // 简介
+}
+
+// 更新个人资料响应
+type UpdateProfileResp {
+    Code    int    `json:"code"`    // 状态码
+    Message string `json:"message"` // 消息
+}
+
+// 获取个人资料请求
+type GetProfileReq {
+}
+
+// 获取个人资料响应
+type GetProfileResp {
+    Code    int    `json:"code"`    // 状态码
+    Message string `json:"message"` // 消息
+    Data    UserProfile `json:"data"`  // 个人资料
+}
+
+// 个人资料
+type UserProfile {
+    Id           int64    `json:"id"`           // 用户ID
+    Username     string   `json:"username"`     // 用户名
+    Email        string   `json:"email"`        // 邮箱
+    Phone        string   `json:"phone"`        // 手机号
+    Nickname     string   `json:"nickname"`     // 昵称
+    Avatar       string   `json:"avatar"`       // 头像
+    Gender       int      `json:"gender"`       // 性别
+    Birthday     string   `json:"birthday"`     // 生日
+    Address      string   `json:"address"`      // 地址
+    Introduction string   `json:"introduction"` // 简介
+    Roles        []string `json:"roles"`        // 角色列表
+    Permissions  []string `json:"permissions"`  // 权限列表
+    CreatedAt    int64    `json:"createdAt"`    // 创建时间
+    UpdatedAt    int64    `json:"updatedAt"`    // 更新时间
+}
+
+// ==================== 角色管理模块类型定义 ====================
+
+// 获取角色列表请求
+type GetRoleListReq {
+    PaginationReq
+    Name string `json:"name,optional" form:"name,optional"` // 角色名称（模糊查询）
+    Code string `json:"code,optional" form:"code,optional"` // 角色编码（模糊查询）
+}
+
+// 获取角色列表响应
+type GetRoleListResp {
+    Code       int             `json:"code"`       // 状态码
+    Message    string          `json:"message"`    // 消息
+    Pagination PaginationResp  `json:"pagination"` // 分页信息
+    Data       []RoleListItem  `json:"data"`       // 角色列表
+}
+
+// 角色列表项
+type RoleListItem {
+    Id          int64  `json:"id"`          // 角色ID
+    Name        string `json:"name"`        // 角色名称
+    Code        string `json:"code"`        // 角色编码
+    Description string `json:"description"` // 角色描述
+    Status      int    `json:"status"`      // 状态
+    Sort        int    `json:"sort"`        // 排序
+    CreatedAt   int64  `json:"createdAt"`   // 创建时间
+    UpdatedAt   int64  `json:"updatedAt"`   // 更新时间
+}
+
+// 根据ID获取角色请求
+type GetRoleByIdReq {
+    Id int64 `json:"id,optional" path:"id"` // 角色ID
+}
+
+// 根据ID获取角色响应
+type GetRoleByIdResp {
+    Code    int    `json:"code"`    // 状态码
+    Message string `json:"message"` // 消息
+    Data    RoleDetail `json:"data"`   // 角色详情
+}
+
+// 角色详情
+type RoleDetail {
+    Id          int64           `json:"id"`          // 角色ID
+    Name        string          `json:"name"`        // 角色名称
+    Code        string          `json:"code"`        // 角色编码
+    Description string          `json:"description"` // 角色描述
+    Status      int             `json:"status"`      // 状态
+    Sort        int             `json:"sort"`        // 排序
+    Permissions []PermissionInfo `json:"permissions"` // 权限列表
+    CreatedAt   int64           `json:"createdAt"`   // 创建时间
+    UpdatedAt   int64           `json:"updatedAt"`   // 更新时间
+}
+
+// 权限信息
+type PermissionInfo {
+    Id          int64  `json:"id"`          // 权限ID
+    Name        string `json:"name"`        // 权限名称
+    Code        string `json:"code"`        // 权限编码
+    Type        string `json:"type"`        // 权限类型
+    Description string `json:"description"` // 权限描述
+}
+
+// 创建角色请求
+type CreateRoleReq {
+    Name        string `json:"name"`        // 角色名称
+    Code        string `json:"code"`        // 角色编码
+    Description string `json:"description,optional"` // 角色描述
+    Status      int    `json:"status,optional"`      // 状态
+    Sort        int    `json:"sort,optional"`        // 排序
+}
+
+// 创建角色响应
+type CreateRoleResp {
+    Code    int    `json:"code"`    // 状态码
+    Message string `json:"message"` // 消息
+    RoleId  int64  `json:"roleId"`  // 角色ID
+}
+
+// 更新角色请求
+type UpdateRoleReq {
+    Id          int64  `json:"id,optional" path:"id"` // 角色ID
+    Name        string `json:"name,optional"`          // 角色名称
+    Description string `json:"description,optional"`   // 角色描述
+    Status      int    `json:"status,optional"`        // 状态
+    Sort        int    `json:"sort,optional"`          // 排序
+}
+
+// 更新角色响应
+type UpdateRoleResp {
+    Code    int    `json:"code"`    // 状态码
+    Message string `json:"message"` // 消息
+}
+
+// 删除角色请求
+type DeleteRoleReq {
+    Id int64 `json:"id,optional" path:"id"` // 角色ID
+}
+
+// 删除角色响应
+type DeleteRoleResp {
+    Code    int    `json:"code"`    // 状态码
+    Message string `json:"message"` // 消息
+}
+
+// 分配权限请求
+type AssignPermissionsReq {
+    Id            int64   `json:"id,optional" path:"id"` // 角色ID
+    PermissionIds []int64 `json:"permissionIds"`         // 权限ID列表
+}
+
+// 分配权限响应
+type AssignPermissionsResp {
+    Code    int    `json:"code"`    // 状态码
+    Message string `json:"message"` // 消息
+}
+
+// 获取角色权限请求
+type GetRolePermissionsReq {
+    Id int64 `json:"id,optional" path:"id"` // 角色ID
+}
+
+// 获取角色权限响应
+type GetRolePermissionsResp {
+    Code    int             `json:"code"`    // 状态码
+    Message string          `json:"message"` // 消息
+    Data    []PermissionInfo `json:"data"`     // 权限列表
+}
+
+// ==================== 权限管理模块类型定义 ====================
+
+// 获取权限列表请求
+type GetPermissionListReq {
+    PaginationReq
+    Name string `json:"name,optional" form:"name,optional"` // 权限名称（模糊查询）
+    Code string `json:"code,optional" form:"code,optional"` // 权限编码（模糊查询）
+    Type string `json:"type,optional" form:"type,optional"` // 权限类型
+}
+
+// 获取权限列表响应
+type GetPermissionListResp {
+    Code       int                 `json:"code"`       // 状态码
+    Message    string              `json:"message"`    // 消息
+    Pagination PaginationResp      `json:"pagination"` // 分页信息
+    Data       []PermissionListItem `json:"data"`       // 权限列表
+}
+
+// 权限列表项
+type PermissionListItem {
+    Id          int64  `json:"id"`          // 权限ID
+    Name        string `json:"name"`        // 权限名称
+    Code        string `json:"code"`        // 权限编码
+    Type        string `json:"type"`        // 权限类型
+    ParentId    int64  `json:"parentId"`    // 父权限ID
+    Description string `json:"description"` // 权限描述
+    Path        string `json:"path"`        // 路径
+    Method      string `json:"method"`      // 请求方法
+    Status      int    `json:"status"`      // 状态
+    Sort        int    `json:"sort"`        // 排序
+    CreatedAt   int64  `json:"createdAt"`   // 创建时间
+    UpdatedAt   int64  `json:"updatedAt"`   // 更新时间
+}
+
+// 根据ID获取权限请求
+type GetPermissionByIdReq {
+    Id int64 `json:"id,optional" path:"id"` // 权限ID
+}
+
+// 根据ID获取权限响应
+type GetPermissionByIdResp {
+    Code    int    `json:"code"`    // 状态码
+    Message string `json:"message"` // 消息
+    Data    PermissionDetail `json:"data"`   // 权限详情
+}
+
+// 权限详情
+type PermissionDetail {
+    Id          int64  `json:"id"`          // 权限ID
+    Name        string `json:"name"`        // 权限名称
+    Code        string `json:"code"`        // 权限编码
+    Type        string `json:"type"`        // 权限类型
+    ParentId    int64  `json:"parentId"`    // 父权限ID
+    Description string `json:"description"` // 权限描述
+    Path        string `json:"path"`        // 路径
+    Method      string `json:"method"`      // 请求方法
+    Status      int    `json:"status"`      // 状态
+    Sort        int    `json:"sort"`        // 排序
+    CreatedAt   int64  `json:"createdAt"`   // 创建时间
+    UpdatedAt   int64  `json:"updatedAt"`   // 更新时间
+}
+
+// 创建权限请求
+type CreatePermissionReq {
+    Name        string `json:"name"`        // 权限名称
+    Code        string `json:"code"`        // 权限编码
+    Type        string `json:"type"`        // 权限类型
+    ParentId    int64  `json:"parentId,optional"`    // 父权限ID
+    Description string `json:"description,optional"` // 权限描述
+    Path        string `json:"path,optional"`        // 路径
+    Method      string `json:"method,optional"`      // 请求方法
+    Status      int    `json:"status,optional"`      // 状态
+    Sort        int    `json:"sort,optional"`        // 排序
+}
+
+// 创建权限响应
+type CreatePermissionResp {
+    Code         int    `json:"code"`         // 状态码
+    Message      string `json:"message"`      // 消息
+    PermissionId int64  `json:"permissionId"` // 权限ID
+}
+
+// 更新权限请求
+type UpdatePermissionReq {
+    Id          int64  `json:"id,optional" path:"id"` // 权限ID
+    Name        string `json:"name,optional"`          // 权限名称
+    Description string `json:"description,optional"`   // 权限描述
+    Path        string `json:"path,optional"`          // 路径
+    Method      string `json:"method,optional"`        // 请求方法
+    Status      int    `json:"status,optional"`        // 状态
+    Sort        int    `json:"sort,optional"`          // 排序
+}
+
+// 更新权限响应
+type UpdatePermissionResp {
+    Code    int    `json:"code"`    // 状态码
+    Message string `json:"message"` // 消息
+}
+
+// 删除权限请求
+type DeletePermissionReq {
+    Id int64 `json:"id,optional" path:"id"` // 权限ID
+}
+
+// 删除权限响应
+type DeletePermissionResp {
+    Code    int    `json:"code"`    // 状态码
+    Message string `json:"message"` // 消息
+}
+
+// ==================== 菜单管理模块类型定义 ====================
+
+// 获取菜单列表请求
+type GetMenuListReq {
+    PaginationReq
+    Name string `json:"name,optional" form:"name,optional"` // 菜单名称（模糊查询）
+    Type string `json:"type,optional" form:"type,optional"` // 菜单类型
+}
+
+// 获取菜单列表响应
+type GetMenuListResp {
+    Code       int             `json:"code"`       // 状态码
+    Message    string          `json:"message"`    // 消息
+    Pagination PaginationResp  `json:"pagination"` // 分页信息
+    Data       []MenuListItem  `json:"data"`       // 菜单列表
+}
+
+// 菜单列表项
+type MenuListItem {
+    Id          int64  `json:"id"`          // 菜单ID
+    Name        string `json:"name"`        // 菜单名称
+    Type        string `json:"type"`        // 菜单类型
+    ParentId    int64  `json:"parentId"`    // 父菜单ID
+    Path        string `json:"path"`        // 路由路径
+    Component   string `json:"component"`   // 组件路径
+    Icon        string `json:"icon"`        // 图标
+    Title       string `json:"title"`       // 标题
+    Redirect    string `json:"redirect"`    // 重定向
+    Hidden      bool   `json:"hidden"`      // 是否隐藏
+    AlwaysShow  bool   `json:"alwaysShow"`  // 是否总是显示
+    Status      int    `json:"status"`      // 状态
+    Sort        int    `json:"sort"`        // 排序
+    CreatedAt   int64  `json:"createdAt"`   // 创建时间
+    UpdatedAt   int64  `json:"updatedAt"`   // 更新时间
+}
+
+// 根据ID获取菜单请求
+type GetMenuByIdReq {
+    Id int64 `json:"id,optional" path:"id"` // 菜单ID
+}
+
+// 根据ID获取菜单响应
+type GetMenuByIdResp {
+    Code    int    `json:"code"`    // 状态码
+    Message string `json:"message"` // 消息
+    Data    MenuDetail `json:"data"`   // 菜单详情
+}
+
+// 菜单详情
+type MenuDetail {
+    Id          int64  `json:"id"`          // 菜单ID
+    Name        string `json:"name"`        // 菜单名称
+    Type        string `json:"type"`        // 菜单类型
+    ParentId    int64  `json:"parentId"`    // 父菜单ID
+    Path        string `json:"path"`        // 路由路径
+    Component   string `json:"component"`   // 组件路径
+    Icon        string `json:"icon"`        // 图标
+    Title       string `json:"title"`       // 标题
+    Redirect    string `json:"redirect"`    // 重定向
+    Hidden      bool   `json:"hidden"`      // 是否隐藏
+    AlwaysShow  bool   `json:"alwaysShow"`  // 是否总是显示
+    Permission  string `json:"permission"`  // 权限编码
+    Status      int    `json:"status"`      // 状态
+    Sort        int    `json:"sort"`        // 排序
+    CreatedAt   int64  `json:"createdAt"`   // 创建时间
+    UpdatedAt   int64  `json:"updatedAt"`   // 更新时间
+}
+
+// 创建菜单请求
+type CreateMenuReq {
+    Name        string `json:"name"`        // 菜单名称
+    Type        string `json:"type"`        // 菜单类型
+    ParentId    int64  `json:"parentId,optional"`    // 父菜单ID
+    Path        string `json:"path,optional"`        // 路由路径
+    Component   string `json:"component,optional"`   // 组件路径
+    Icon        string `json:"icon,optional"`        // 图标
+    Title       string `json:"title"`       // 标题
+    Redirect    string `json:"redirect,optional"`    // 重定向
+    Hidden      bool   `json:"hidden,optional"`      // 是否隐藏
+    AlwaysShow  bool   `json:"alwaysShow,optional"`  // 是否总是显示
+    Permission  string `json:"permission,optional"`  // 权限编码
+    Status      int    `json:"status,optional"`      // 状态
+    Sort        int    `json:"sort,optional"`        // 排序
+}
+
+// 创建菜单响应
+type CreateMenuResp {
+    Code    int    `json:"code"`    // 状态码
+    Message string `json:"message"` // 消息
+    MenuId  int64  `json:"menuId"`  // 菜单ID
+}
+
+// 更新菜单请求
+type UpdateMenuReq {
+    Id          int64  `json:"id,optional" path:"id"` // 菜单ID
+    Name        string `json:"name,optional"`          // 菜单名称
+    ParentId    int64  `json:"parentId,optional"`      // 父菜单ID
+    Path        string `json:"path,optional"`          // 路由路径
+    Component   string `json:"component,optional"`     // 组件路径
+    Icon        string `json:"icon,optional"`          // 图标
+    Title       string `json:"title,optional"`         // 标题
+    Redirect    string `json:"redirect,optional"`      // 重定向
+    Hidden      bool   `json:"hidden,optional"`        // 是否隐藏
+    AlwaysShow  bool   `json:"alwaysShow,optional"`    // 是否总是显示
+    Permission  string `json:"permission,optional"`    // 权限编码
+    Status      int    `json:"status,optional"`        // 状态
+    Sort        int    `json:"sort,optional"`          // 排序
+}
+
+// 更新菜单响应
+type UpdateMenuResp {
+    Code    int    `json:"code"`    // 状态码
+    Message string `json:"message"` // 消息
+}
+
+// 删除菜单请求
+type DeleteMenuReq {
+    Id int64 `json:"id,optional" path:"id"` // 菜单ID
+}
+
+// 删除菜单响应
+type DeleteMenuResp {
+    Code    int    `json:"code"`    // 状态码
+    Message string `json:"message"` // 消息
+}
+
+// 获取用户菜单请求
+type GetUserMenusReq {
+}
+
+// 获取用户菜单响应
+type GetUserMenusResp {
+    Code    int           `json:"code"`    // 状态码
+    Message string        `json:"message"` // 消息
+    Data    []UserMenuTree `json:"data"`     // 用户菜单树
+}
+
+// 用户菜单树
+type UserMenuTree {
+    Id          int64          `json:"id"`          // 菜单ID
+    Name        string         `json:"name"`        // 菜单名称
+    Type        string         `json:"type"`        // 菜单类型
+    ParentId    int64          `json:"parentId"`    // 父菜单ID
+    Path        string         `json:"path"`        // 路由路径
+    Component   string         `json:"component"`   // 组件路径
+    Icon        string         `json:"icon"`        // 图标
+    Title       string         `json:"title"`       // 标题
+    Redirect    string         `json:"redirect"`    // 重定向
+    Hidden      bool           `json:"hidden"`      // 是否隐藏
+    AlwaysShow  bool           `json:"alwaysShow"`  // 是否总是显示
+    Permission  string         `json:"permission"`  // 权限编码
+    Sort        int            `json:"sort"`        // 排序
+    Children    []UserMenuTree `json:"children"`    // 子菜单
+}
+
+// ==================== 日志管理模块类型定义 ====================
+
+// 获取操作日志列表请求
+type GetOperationLogListReq {
+    PaginationReq
+    UserId     int64  `json:"userId,optional" form:"userId,optional"`         // 用户ID
+    Username   string `json:"username,optional" form:"username,optional"`     // 用户名（模糊查询）
+    Module     string `json:"module,optional" form:"module,optional"`         // 模块
+    Operation  string `json:"operation,optional" form:"operation,optional"`   // 操作
+    Method     string `json:"method,optional" form:"method,optional"`         // 请求方法
+    Status     int    `json:"status,optional" form:"status,optional"`         // 状态
+    StartTime  int64  `json:"startTime,optional" form:"startTime,optional"`   // 开始时间
+    EndTime    int64  `json:"endTime,optional" form:"endTime,optional"`       // 结束时间
+}
+
+// 获取操作日志列表响应
+type GetOperationLogListResp {
+    Code       int                   `json:"code"`       // 状态码
+    Message    string                `json:"message"`    // 消息
+    Pagination PaginationResp        `json:"pagination"` // 分页信息
+    Data       []OperationLogListItem `json:"data"`       // 操作日志列表
+}
+
+// 操作日志列表项
+type OperationLogListItem {
+    Id          int64  `json:"id"`          // 日志ID
+    UserId      int64  `json:"userId"`      // 用户ID
+    Username    string `json:"username"`    // 用户名
+    Module      string `json:"module"`      // 模块
+    Operation   string `json:"operation"`   // 操作
+    Method      string `json:"method"`      // 请求方法
+    Path        string `json:"path"`        // 请求路径
+    Status      int    `json:"status"`      // 状态
+    Ip          string `json:"ip"`          // IP地址
+    UserAgent   string `json:"userAgent"`   // 用户代理
+    RequestData string `json:"requestData"` // 请求数据
+    ResponseData string `json:"responseData"` // 响应数据
+    ErrorMsg    string `json:"errorMsg"`    // 错误信息
+    Duration    int64  `json:"duration"`    // 执行时长（毫秒）
+    CreatedAt   int64  `json:"createdAt"`   // 创建时间
+}
+
+// 获取登录日志列表请求
+type GetLoginLogListReq {
+    PaginationReq
+    UserId    int64  `json:"userId,optional" form:"userId,optional"`       // 用户ID
+    Username  string `json:"username,optional" form:"username,optional"`   // 用户名（模糊查询）
+    Status    int    `json:"status,optional" form:"status,optional"`       // 状态
+    StartTime int64  `json:"startTime,optional" form:"startTime,optional"` // 开始时间
+    EndTime   int64  `json:"endTime,optional" form:"endTime,optional"`     // 结束时间
+}
+
+// 获取登录日志列表响应
+type GetLoginLogListResp {
+    Code       int                `json:"code"`       // 状态码
+    Message    string             `json:"message"`    // 消息
+    Pagination PaginationResp     `json:"pagination"` // 分页信息
+    Data       []LoginLogListItem `json:"data"`       // 登录日志列表
+}
+
+// 登录日志列表项
+type LoginLogListItem {
+    Id        int64  `json:"id"`        // 日志ID
+    UserId    int64  `json:"userId"`    // 用户ID
+    Username  string `json:"username"`  // 用户名
+    Ip        string `json:"ip"`        // IP地址
+    Location  string `json:"location"`  // 地理位置
+    Browser   string `json:"browser"`   // 浏览器
+    Os        string `json:"os"`        // 操作系统
+    UserAgent string `json:"userAgent"` // 用户代理
+    Status    int    `json:"status"`    // 状态
+    Message   string `json:"message"`   // 消息
+    CreatedAt int64  `json:"createdAt"` // 创建时间
+}
+
+// 删除操作日志请求
+type DeleteOperationLogReq {
+    Id int64 `json:"id,optional" path:"id"` // 日志ID
+}
+
+// 删除操作日志响应
+type DeleteOperationLogResp {
+    Code    int    `json:"code"`    // 状态码
+    Message string `json:"message"` // 消息
+}
+
+// 删除登录日志请求
+type DeleteLoginLogReq {
+    Id int64 `json:"id,optional" path:"id"` // 日志ID
+}
+
+// 删除登录日志响应
+type DeleteLoginLogResp {
+    Code    int    `json:"code"`    // 状态码
+    Message string `json:"message"` // 消息
+}
+
+// 清空操作日志请求
+type ClearOperationLogsReq {
+}
+
+// 清空操作日志响应
+type ClearOperationLogsResp {
+    Code    int    `json:"code"`    // 状态码
+    Message string `json:"message"` // 消息
+}
+
+// 清空登录日志请求
+type ClearLoginLogsReq {
+}
+
+// 清空登录日志响应
+type ClearLoginLogsResp {
+    Code    int    `json:"code"`    // 状态码
+    Message string `json:"message"` // 消息
+}
+
+// ==================== 系统配置模块类型定义 ====================
+
+// 获取配置列表请求
+type GetConfigListReq {
+    PaginationReq
+    Key   string `json:"key,optional" form:"key,optional"`   // 配置键（模糊查询）
+    Name  string `json:"name,optional" form:"name,optional"` // 配置名称（模糊查询）
+    Group string `json:"group,optional" form:"group,optional"` // 配置分组
+}
+
+// 获取配置列表响应
+type GetConfigListResp {
+    Code       int                 `json:"code"`       // 状态码
+    Message    string              `json:"message"`    // 消息
+    Pagination PaginationResp      `json:"pagination"` // 分页信息
+    Data       []ConfigListItem    `json:"data"`       // 配置列表
+}
+
+// 配置列表项
+type ConfigListItem {
+    Id          int64  `json:"id"`          // 配置ID
+    Key         string `json:"key"`         // 配置键
+    Name        string `json:"name"`        // 配置名称
+    Value       string `json:"value"`       // 配置值
+    Type        string `json:"type"`        // 配置类型
+    Group       string `json:"group"`       // 配置分组
+    Description string `json:"description"` // 配置描述
+    Status      int    `json:"status"`      // 状态
+    CreatedAt   int64  `json:"createdAt"`   // 创建时间
+    UpdatedAt   int64  `json:"updatedAt"`   // 更新时间
+}
+
+// 根据键获取配置请求
+type GetConfigByKeyReq {
+    Key string `json:"key,optional" path:"key"` // 配置键
+}
+
+// 根据键获取配置响应
+type GetConfigByKeyResp {
+    Code    int          `json:"code"`    // 状态码
+    Message string       `json:"message"` // 消息
+    Data    ConfigDetail `json:"data"`   // 配置详情
+}
+
+// 配置详情
+type ConfigDetail {
+    Id          int64  `json:"id"`          // 配置ID
+    Key         string `json:"key"`         // 配置键
+    Name        string `json:"name"`        // 配置名称
+    Value       string `json:"value"`       // 配置值
+    Type        string `json:"type"`        // 配置类型
+    Group       string `json:"group"`       // 配置分组
+    Description string `json:"description"` // 配置描述
+    Status      int    `json:"status"`      // 状态
+    CreatedAt   int64  `json:"createdAt"`   // 创建时间
+    UpdatedAt   int64  `json:"updatedAt"`   // 更新时间
+}
+
+// 创建配置请求
+type CreateConfigReq {
+    Key         string `json:"key"`         // 配置键
+    Name        string `json:"name"`        // 配置名称
+    Value       string `json:"value"`       // 配置值
+    Type        string `json:"type"`        // 配置类型
+    Group       string `json:"group,optional"`       // 配置分组
+    Description string `json:"description,optional"` // 配置描述
+    Status      int    `json:"status,optional"`      // 状态
+}
+
+// 创建配置响应
+type CreateConfigResp {
+    Code    int    `json:"code"`    // 状态码
+    Message string `json:"message"` // 消息
+    ConfigId int64 `json:"configId"` // 配置ID
+}
+
+// 更新配置请求
+type UpdateConfigReq {
+    Key         string `json:"key,optional" path:"key"` // 配置键
+    Name        string `json:"name,optional"`            // 配置名称
+    Value       string `json:"value,optional"`           // 配置值
+    Description string `json:"description,optional"`     // 配置描述
+    Status      int    `json:"status,optional"`          // 状态
+}
+
+// 更新配置响应
+type UpdateConfigResp {
+    Code    int    `json:"code"`    // 状态码
+    Message string `json:"message"` // 消息
+}
+
+// 删除配置请求
+type DeleteConfigReq {
+    Key string `json:"key,optional" path:"key"` // 配置键
+}
+
+// 删除配置响应
+type DeleteConfigResp {
+    Code    int    `json:"code"`    // 状态码
+    Message string `json:"message"` // 消息
+}
