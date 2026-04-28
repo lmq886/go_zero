@@ -1,0 +1,1136 @@
+openapi: 3.0.3
+info:
+  title: 企业级后台管理系统 API
+  description: |
+    包含用户管理、角色权限、菜单管理、日志管理等完整后台功能的 RESTful API 服务。
+    
+    ## 认证方式
+    
+    除公开接口外，所有接口都需要通过 Bearer Token 进行认证。
+    
+    **获取 Token**：
+    1. 调用 `POST /api/v1/auth/login` 登录获取 accessToken
+    2. 在请求头中添加 `Authorization: Bearer <accessToken>`
+    
+    **Token 刷新**：
+    当 accessToken 过期时，使用 refreshToken 调用 `POST /api/v1/auth/refresh` 获取新的 accessToken。
+  version: v1.0.0
+  contact:
+    name: GoZero Enterprise Team
+    email: support@gozero.com
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
+servers:
+  - url: http://localhost:8080
+    description: 本地开发环境
+tags:
+  - name: 认证模块
+    description: 用户认证相关接口（登录、注册、登出、刷新令牌）
+  - name: 用户管理
+    description: 用户 CRUD 操作、重置密码、个人资料管理
+  - name: 角色管理
+    description: 角色 CRUD 操作、权限分配
+  - name: 权限管理
+    description: 权限 CRUD 操作
+  - name: 菜单管理
+    description: 菜单 CRUD 操作、用户菜单查询
+  - name: 日志管理
+    description: 操作日志、登录日志查询和管理
+  - name: 系统配置
+    description: 系统配置项管理
+  - name: 健康检查
+    description: 服务健康状态检查
+paths:
+  /health:
+    get:
+      tags:
+        - 健康检查
+      summary: 健康检查
+      description: 检查服务运行状态
+      operationId: healthCheck
+      responses:
+        '200':
+          description: 服务正常运行
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HealthResp'
+        '500':
+          description: 服务异常
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResp'
+  /api/v1/auth/login:
+    post:
+      tags:
+        - 认证模块
+      summary: 用户登录
+      description: 使用用户名和密码登录，返回访问令牌和刷新令牌
+      operationId: login
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginReq'
+            example:
+              username: admin
+              password: admin123
+      responses:
+        '200':
+          description: 登录成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LoginResp'
+              example:
+                code: 0
+                message: success
+                accessToken: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+                refreshToken: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+                expiresAt: 1714070400
+                userInfo:
+                  id: 1
+                  username: admin
+                  email: admin@example.com
+                  phone: 13800138000
+                  nickname: 管理员
+                  avatar: /avatars/admin.png
+                  status: 1
+                  roles:
+                    - super_admin
+                  permissions:
+                    - system:user:list
+                    - system:user:create
+                  createdAt: 1713811200
+        '400':
+          description: 请求参数错误
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResp'
+        '401':
+          description: 用户名或密码错误
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResp'
+  /api/v1/auth/register:
+    post:
+      tags:
+        - 认证模块
+      summary: 用户注册
+      description: 创建新用户账号
+      operationId: register
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegisterReq'
+            example:
+              username: newuser
+              password: password123
+              email: newuser@example.com
+              phone: 13800138001
+              nickname: 新用户
+      responses:
+        '200':
+          description: 注册成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RegisterResp'
+              example:
+                code: 0
+                message: success
+                userId: 2
+        '400':
+          description: 请求参数错误
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResp'
+        '409':
+          description: 用户名已存在
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResp'
+  /api/v1/auth/logout:
+    post:
+      tags:
+        - 认证模块
+      summary: 用户登出
+      description: 注销当前登录用户（需要认证）
+      operationId: logout
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: 登出成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LogoutResp'
+              example:
+                code: 0
+                message: success
+        '401':
+          description: 未授权
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResp'
+  /api/v1/auth/refresh:
+    post:
+      tags:
+        - 认证模块
+      summary: 刷新令牌
+      description: 使用刷新令牌获取新的访问令牌
+      operationId: refreshToken
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RefreshTokenReq'
+            example:
+              refreshToken: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+      responses:
+        '200':
+          description: 刷新成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RefreshTokenResp'
+              example:
+                code: 0
+                message: success
+                accessToken: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+                expiresAt: 1714070400
+        '400':
+          description: 刷新令牌无效
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResp'
+  /api/v1/users:
+    get:
+      tags:
+        - 用户管理
+      summary: 获取用户列表
+      description: 分页获取用户列表，支持按条件筛选（需要认证）
+      operationId: getUserList
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: page
+          in: query
+          description: 页码，默认 1
+          schema:
+            type: integer
+            default: 1
+        - name: pageSize
+          in: query
+          description: 每页数量，默认 10
+          schema:
+            type: integer
+            default: 10
+        - name: username
+          in: query
+          description: 用户名（模糊查询）
+          schema:
+            type: string
+        - name: email
+          in: query
+          description: 邮箱（模糊查询）
+          schema:
+            type: string
+        - name: phone
+          in: query
+          description: 手机号（模糊查询）
+          schema:
+            type: string
+        - name: status
+          in: query
+          description: 状态（1: 启用, 0: 禁用）
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: 获取成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetUserListResp'
+        '401':
+          description: 未授权
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResp'
+    post:
+      tags:
+        - 用户管理
+      summary: 创建用户
+      description: 创建新用户（需要认证）
+      operationId: createUser
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateUserReq'
+      responses:
+        '200':
+          description: 创建成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateUserResp'
+        '400':
+          description: 请求参数错误
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResp'
+        '401':
+          description: 未授权
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResp'
+  /api/v1/users/{id}:
+    get:
+      tags:
+        - 用户管理
+      summary: 根据ID获取用户
+      description: 根据用户ID获取用户详情（需要认证）
+      operationId: getUserById
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: 用户ID
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: 获取成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetUserByIdResp'
+        '401':
+          description: 未授权
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResp'
+        '404':
+          description: 用户不存在
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResp'
+    put:
+      tags:
+        - 用户管理
+      summary: 更新用户
+      description: 根据用户ID更新用户信息（需要认证）
+      operationId: updateUser
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: 用户ID
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateUserReq'
+      responses:
+        '200':
+          description: 更新成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UpdateUserResp'
+        '400':
+          description: 请求参数错误
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResp'
+        '401':
+          description: 未授权
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResp'
+        '404':
+          description: 用户不存在
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResp'
+    delete:
+      tags:
+        - 用户管理
+      summary: 删除用户
+      description: 根据用户ID删除用户（需要认证）
+      operationId: deleteUser
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: 用户ID
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: 删除成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeleteUserResp'
+        '401':
+          description: 未授权
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResp'
+        '404':
+          description: 用户不存在
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResp'
+  /api/v1/users/{id}/reset-password:
+    post:
+      tags:
+        - 用户管理
+      summary: 重置用户密码
+      description: 管理员重置用户密码（需要认证）
+      operationId: resetPassword
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: 用户ID
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ResetPasswordReq'
+      responses:
+        '200':
+          description: 重置成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResetPasswordResp'
+        '400':
+          description: 请求参数错误
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResp'
+        '401':
+          description: 未授权
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResp'
+        '404':
+          description: 用户不存在
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResp'
+  /api/v1/users/profile:
+    get:
+      tags:
+        - 用户管理
+      summary: 获取当前用户资料
+      description: 获取当前登录用户的个人资料（需要认证）
+      operationId: getProfile
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: 获取成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetProfileResp'
+        '401':
+          description: 未授权
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResp'
+    put:
+      tags:
+        - 用户管理
+      summary: 更新当前用户资料
+      description: 更新当前登录用户的个人资料（需要认证）
+      operationId: updateProfile
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateProfileReq'
+      responses:
+        '200':
+          description: 更新成功
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UpdateProfileResp'
+        '400':
+          description: 请求参数错误
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResp'
+        '401':
+          description: 未授权
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResp'
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: |
+        JWT 认证方式。
+        请在请求头中添加: Authorization: Bearer <accessToken>
+  schemas:
+    HealthResp:
+      type: object
+      properties:
+        status:
+          type: string
+          description: 服务状态
+          example: ok
+        version:
+          type: string
+          description: 服务版本
+          example: v1.0.0
+        uptime:
+          type: string
+          description: 运行时间
+          example: service is running
+    ErrorResp:
+      type: object
+      properties:
+        code:
+          type: integer
+          description: 状态码（非0表示错误）
+          example: 401
+        message:
+          type: string
+          description: 错误消息
+          example: 未授权
+    LoginReq:
+      type: object
+      required:
+        - username
+        - password
+      properties:
+        username:
+          type: string
+          description: 用户名
+          example: admin
+        password:
+          type: string
+          description: 密码
+          example: admin123
+    LoginResp:
+      type: object
+      properties:
+        code:
+          type: integer
+          description: 状态码
+          example: 0
+        message:
+          type: string
+          description: 消息
+          example: success
+        accessToken:
+          type: string
+          description: 访问令牌
+          example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+        refreshToken:
+          type: string
+          description: 刷新令牌
+          example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+        expiresAt:
+          type: integer
+          description: 过期时间戳（秒）
+          example: 1714070400
+        userInfo:
+          $ref: '#/components/schemas/UserInfo'
+    UserInfo:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: 用户ID
+          example: 1
+        username:
+          type: string
+          description: 用户名
+          example: admin
+        email:
+          type: string
+          description: 邮箱
+          example: admin@example.com
+        phone:
+          type: string
+          description: 手机号
+          example: 13800138000
+        nickname:
+          type: string
+          description: 昵称
+          example: 管理员
+        avatar:
+          type: string
+          description: 头像
+          example: /avatars/admin.png
+        status:
+          type: integer
+          description: 状态（1: 启用, 0: 禁用）
+          example: 1
+        roles:
+          type: array
+          description: 角色列表
+          items:
+            type: string
+          example: ["super_admin"]
+        permissions:
+          type: array
+          description: 权限列表
+          items:
+            type: string
+          example: ["system:user:list", "system:user:create"]
+        createdAt:
+          type: integer
+          description: 创建时间戳（秒）
+          example: 1713811200
+    RegisterReq:
+      type: object
+      required:
+        - username
+        - password
+      properties:
+        username:
+          type: string
+          description: 用户名
+          example: newuser
+        password:
+          type: string
+          description: 密码
+          example: password123
+        email:
+          type: string
+          description: 邮箱
+          example: newuser@example.com
+        phone:
+          type: string
+          description: 手机号
+          example: 13800138001
+        nickname:
+          type: string
+          description: 昵称
+          example: 新用户
+    RegisterResp:
+      type: object
+      properties:
+        code:
+          type: integer
+          description: 状态码
+          example: 0
+        message:
+          type: string
+          description: 消息
+          example: success
+        userId:
+          type: integer
+          description: 用户ID
+          example: 2
+    LogoutResp:
+      type: object
+      properties:
+        code:
+          type: integer
+          description: 状态码
+          example: 0
+        message:
+          type: string
+          description: 消息
+          example: success
+    RefreshTokenReq:
+      type: object
+      required:
+        - refreshToken
+      properties:
+        refreshToken:
+          type: string
+          description: 刷新令牌
+          example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+    RefreshTokenResp:
+      type: object
+      properties:
+        code:
+          type: integer
+          description: 状态码
+          example: 0
+        message:
+          type: string
+          description: 消息
+          example: success
+        accessToken:
+          type: string
+          description: 访问令牌
+          example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+        expiresAt:
+          type: integer
+          description: 过期时间戳（秒）
+          example: 1714070400
+    PaginationReq:
+      type: object
+      properties:
+        page:
+          type: integer
+          description: 页码，默认 1
+          default: 1
+        pageSize:
+          type: integer
+          description: 每页数量，默认 10
+          default: 10
+    PaginationResp:
+      type: object
+      properties:
+        total:
+          type: integer
+          description: 总记录数
+          example: 100
+        page:
+          type: integer
+          description: 当前页码
+          example: 1
+        pageSize:
+          type: integer
+          description: 每页数量
+          example: 10
+    GetUserListResp:
+      type: object
+      properties:
+        code:
+          type: integer
+          description: 状态码
+          example: 0
+        message:
+          type: string
+          description: 消息
+          example: success
+        pagination:
+          $ref: '#/components/schemas/PaginationResp'
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/UserListItem'
+    UserListItem:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: 用户ID
+          example: 1
+        username:
+          type: string
+          description: 用户名
+          example: admin
+        email:
+          type: string
+          description: 邮箱
+          example: admin@example.com
+        phone:
+          type: string
+          description: 手机号
+          example: 13800138000
+        nickname:
+          type: string
+          description: 昵称
+          example: 管理员
+        avatar:
+          type: string
+          description: 头像
+          example: /avatars/admin.png
+        status:
+          type: integer
+          description: 状态
+          example: 1
+        roles:
+          type: array
+          description: 角色列表
+          items:
+            type: string
+          example: ["super_admin"]
+        createdAt:
+          type: integer
+          description: 创建时间戳
+          example: 1713811200
+        updatedAt:
+          type: integer
+          description: 更新时间戳
+          example: 1713811200
+    GetUserByIdResp:
+      type: object
+      properties:
+        code:
+          type: integer
+          description: 状态码
+          example: 0
+        message:
+          type: string
+          description: 消息
+          example: success
+        data:
+          $ref: '#/components/schemas/UserDetail'
+    UserDetail:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: 用户ID
+          example: 1
+        username:
+          type: string
+          description: 用户名
+          example: admin
+        email:
+          type: string
+          description: 邮箱
+          example: admin@example.com
+        phone:
+          type: string
+          description: 手机号
+          example: 13800138000
+        nickname:
+          type: string
+          description: 昵称
+          example: 管理员
+        avatar:
+          type: string
+          description: 头像
+          example: /avatars/admin.png
+        gender:
+          type: integer
+          description: 性别（1: 男, 2: 女, 0: 未知）
+          example: 1
+        birthday:
+          type: string
+          description: 生日
+          example: 1990-01-01
+        address:
+          type: string
+          description: 地址
+          example: 北京市朝阳区
+        introduction:
+          type: string
+          description: 简介
+          example: 系统管理员
+        status:
+          type: integer
+          description: 状态
+          example: 1
+        roles:
+          type: array
+          items:
+            $ref: '#/components/schemas/RoleInfo'
+        createdAt:
+          type: integer
+          description: 创建时间戳
+          example: 1713811200
+        updatedAt:
+          type: integer
+          description: 更新时间戳
+          example: 1713811200
+    RoleInfo:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: 角色ID
+          example: 1
+        name:
+          type: string
+          description: 角色名称
+          example: 超级管理员
+        code:
+          type: string
+          description: 角色编码
+          example: super_admin
+        description:
+          type: string
+          description: 角色描述
+          example: 系统超级管理员，拥有所有权限
+    CreateUserReq:
+      type: object
+      required:
+        - username
+        - password
+      properties:
+        username:
+          type: string
+          description: 用户名
+        password:
+          type: string
+          description: 密码
+        email:
+          type: string
+          description: 邮箱
+        phone:
+          type: string
+          description: 手机号
+        nickname:
+          type: string
+          description: 昵称
+        avatar:
+          type: string
+          description: 头像
+        status:
+          type: integer
+          description: 状态
+        roleIds:
+          type: array
+          description: 角色ID列表
+          items:
+            type: integer
+    CreateUserResp:
+      type: object
+      properties:
+        code:
+          type: integer
+          description: 状态码
+          example: 0
+        message:
+          type: string
+          description: 消息
+          example: success
+        userId:
+          type: integer
+          description: 用户ID
+          example: 2
+    UpdateUserReq:
+      type: object
+      properties:
+        email:
+          type: string
+          description: 邮箱
+        phone:
+          type: string
+          description: 手机号
+        nickname:
+          type: string
+          description: 昵称
+        avatar:
+          type: string
+          description: 头像
+        gender:
+          type: integer
+          description: 性别
+        birthday:
+          type: string
+          description: 生日
+        address:
+          type: string
+          description: 地址
+        introduction:
+          type: string
+          description: 简介
+        status:
+          type: integer
+          description: 状态
+        roleIds:
+          type: array
+          description: 角色ID列表
+          items:
+            type: integer
+    UpdateUserResp:
+      type: object
+      properties:
+        code:
+          type: integer
+          description: 状态码
+          example: 0
+        message:
+          type: string
+          description: 消息
+          example: success
+    DeleteUserResp:
+      type: object
+      properties:
+        code:
+          type: integer
+          description: 状态码
+          example: 0
+        message:
+          type: string
+          description: 消息
+          example: success
+    ResetPasswordReq:
+      type: object
+      required:
+        - newPassword
+      properties:
+        newPassword:
+          type: string
+          description: 新密码
+    ResetPasswordResp:
+      type: object
+      properties:
+        code:
+          type: integer
+          description: 状态码
+          example: 0
+        message:
+          type: string
+          description: 消息
+          example: success
+    GetProfileResp:
+      type: object
+      properties:
+        code:
+          type: integer
+          description: 状态码
+          example: 0
+        message:
+          type: string
+          description: 消息
+          example: success
+        data:
+          $ref: '#/components/schemas/UserProfile'
+    UserProfile:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: 用户ID
+          example: 1
+        username:
+          type: string
+          description: 用户名
+          example: admin
+        email:
+          type: string
+          description: 邮箱
+          example: admin@example.com
+        phone:
+          type: string
+          description: 手机号
+          example: 13800138000
+        nickname:
+          type: string
+          description: 昵称
+          example: 管理员
+        avatar:
+          type: string
+          description: 头像
+          example: /avatars/admin.png
+        gender:
+          type: integer
+          description: 性别
+          example: 1
+        birthday:
+          type: string
+          description: 生日
+          example: 1990-01-01
+        address:
+          type: string
+          description: 地址
+          example: 北京市朝阳区
+        introduction:
+          type: string
+          description: 简介
+          example: 系统管理员
+        roles:
+          type: array
+          description: 角色列表
+          items:
+            type: string
+          example: ["super_admin"]
+        permissions:
+          type: array
+          description: 权限列表
+          items:
+            type: string
+          example: ["system:user:list", "system:user:create"]
+        createdAt:
+          type: integer
+          description: 创建时间戳
+          example: 1713811200
+        updatedAt:
+          type: integer
+          description: 更新时间戳
+          example: 1713811200
+    UpdateProfileReq:
+      type: object
+      properties:
+        nickname:
+          type: string
+          description: 昵称
+        avatar:
+          type: string
+          description: 头像
+        gender:
+          type: integer
+          description: 性别
+        birthday:
+          type: string
+          description: 生日
+        address:
+          type: string
+          description: 地址
+        introduction:
+          type: string
+          description: 简介
+    UpdateProfileResp:
+      type: object
+      properties:
+        code:
+          type: integer
+          description: 状态码
+          example: 0
+        message:
+          type: string
+          description: 消息
+          example: success
