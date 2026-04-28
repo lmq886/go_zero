@@ -11,7 +11,7 @@ Host: 0.0.0.0
 Port: 8080
 
 # 服务模式（debug, test, release）
-Mode: debug
+Mode: dev
 
 # 日志配置
 Log:

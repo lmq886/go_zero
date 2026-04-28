@@ -1,6 +1,8 @@
 package routes
 
 import (
+	"net/http"
+
 	"go_zero/api/internal/handler"
 	"go_zero/api/internal/middleware"
 	"go_zero/api/internal/svc"
@@ -30,6 +32,30 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 			middleware.NewRateLimitMiddleware(serverCtx.Config.RateLimit).Handle,
 		)
 	}
+
+	// ==================== Swagger 文档路由（公开） ====================
+	server.AddRoutes(
+		[]rest.Route{
+			{
+				// Swagger UI 页面
+				Method:  "GET",
+				Path:    "/swagger/",
+				Handler: wrapHandler(handler.SwaggerUIHandler()),
+			},
+			{
+				// Swagger JSON 文档
+				Method:  "GET",
+				Path:    "/swagger.json",
+				Handler: wrapHandler(handler.SwaggerJSONHandler()),
+			},
+			{
+				// Swagger YAML 文档
+				Method:  "GET",
+				Path:    "/swagger.yaml",
+				Handler: wrapHandler(handler.SwaggerYAMLHandler()),
+			},
+		},
+	)
 
 	// ==================== 公开路由（不需要认证） ====================
 	// 认证模块 - 公开路由
@@ -66,4 +92,9 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 			},
 		},
 	)
+}
+
+// wrapHandler 将 http.HandlerFunc 转换为 http.Handler
+func wrapHandler(h http.HandlerFunc) http.HandlerFunc {
+	return h
 }
