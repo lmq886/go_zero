@@ -217,6 +217,68 @@ curl -X POST http://localhost:8080/api/v1/auth/login \
 
 ---
 
+## Swagger 文档使用说明
+
+项目已集成 Swagger API 文档，可以通过 Web 界面可视化查看和测试所有 API 接口。
+
+### 访问 Swagger UI
+
+服务启动后，访问以下地址：
+
+| 地址 | 描述 |
+|------|------|
+| http://localhost:8080/swagger/ | Swagger UI 界面 |
+| http://localhost:8080/swagger.json | OpenAPI 规范文档（JSON 格式） |
+| http://localhost:8080/swagger.yaml | OpenAPI 规范文档（YAML 格式） |
+
+### 使用 Swagger UI 测试接口
+
+1. **打开 Swagger UI**：访问 http://localhost:8080/swagger/
+
+2. **认证接口测试**：
+   - 找到 `/api/v1/auth/login` 接口
+   - 点击 `Try it out`
+   - 输入请求体：
+     ```json
+     {
+       "username": "admin",
+       "password": "admin123"
+     }
+     ```
+   - 点击 `Execute`，获取 `access_token`
+
+3. **设置认证 Token**：
+   - 点击页面右上角的 `Authorize` 按钮
+   - 在 `Value` 字段输入：`Bearer <你的access_token>`
+   - 点击 `Authorize`，然后点击 `Close`
+
+4. **测试需要认证的接口**：
+   - 找到需要认证的接口（如 `/api/v1/auth/logout`）
+   - 点击 `Try it out`
+   - 点击 `Execute`，查看响应
+
+### Swagger UI 功能特性
+
+- **接口可视化**：所有接口按模块分组展示
+- **参数说明**：每个接口的请求参数、响应结构都有详细说明
+- **在线测试**：直接在浏览器中调用接口，查看请求和响应
+- **认证支持**：支持 Bearer Token 认证，可测试需要登录的接口
+- **Schema 查看**：查看所有请求/响应的数据结构定义
+
+### 文档文件位置
+
+```
+go_zero/
+├── api/
+│   └── internal/
+│       └── handler/
+│           └── swaggerhandler.go    # Swagger UI 处理器
+├── docs/
+│   └── swagger.yaml                  # OpenAPI 规范文档
+```
+
+---
+
 ## API 接口列表
 
 ### 公开接口（无需认证）
