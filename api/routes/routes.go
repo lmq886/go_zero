@@ -43,12 +43,6 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 				Handler: wrapHandler(handler.SwaggerUIHandler()),
 			},
 			{
-				// Swagger UI 重定向
-				Method:  "GET",
-				Path:    "/swagger",
-				Handler: wrapHandler(handler.SwaggerRedirectHandler()),
-			},
-			{
 				// Swagger JSON 文档
 				Method:  "GET",
 				Path:    "/swagger.json",

@@ -491,6 +491,16 @@ var SwaggerJSON = []byte(`{
 // SwaggerUIHandler 提供 Swagger UI 页面
 func SwaggerUIHandler() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
+		// 检查请求路径是否以 /swagger 结尾但没有尾部斜杠
+		// 如果是，则重定向到带尾部斜杠的路径
+		if r.URL.Path == "/swagger" || r.URL.Path == "/swagger/" {
+			// 确保路径以 /swagger/ 结尾，这样相对路径才能正确工作
+			if r.URL.Path == "/swagger" {
+				http.Redirect(w, r, "/swagger/", http.StatusMovedPermanently)
+				return
+			}
+		}
+
 		w.Header().Set("Content-Type", "text/html; charset=utf-8")
 		w.Write([]byte(SwaggerUIHTML))
 	}
